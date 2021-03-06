@@ -7,7 +7,7 @@ import re
 from discord_bot_send_message import SendMessage
 
 def GetDefinition(word, entry):
-    r = requests.get('https://dictionaryapi.com/api/v3/references/collegiate/json/' + word.replace(' ', '%20') + '?key=ae7c88ed-7948-4421-bc91-44ebd72f79fa')
+    r = requests.get('https://dictionaryapi.com/api/v3/references/collegiate/json/' + word.replace(' ', '%20') + '?key=API KEY GOES HERE')
     data = r.json()
 
     count = 0
