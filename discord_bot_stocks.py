@@ -19,7 +19,7 @@ class Stocks(commands.Cog):
             await ctx.send('Please follow the format: `!stocks [ticker] [time (optional)]`')
             return
 
-        request = requests.get('https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=' + message_split[1].upper() + '&interval=5min&apikey=QCMINNI1UEEPB066')
+        request = requests.get('https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=' + message_split[1].upper() + '&interval=5min&apikey=KEY GOES HERE')
         data = request.json()
         if ('Error Message' in data):
             await ctx.send('Invalid ticker')
