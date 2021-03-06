@@ -18,5 +18,6 @@ class Lyrics(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if message.content.lower().startswith('what are the lyrics') or message.content.lower().startswith('!lyrics'):
+        message_in = message.content
+        if message_in.lower().startswith('what are the lyrics') or message_in.lower().startswith('!lyrics'):
             await SendLyrics(self, message.channel, message.content)

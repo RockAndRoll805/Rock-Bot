@@ -2,6 +2,11 @@ from discord.ext import commands
 
 from random import randrange
 
+from discord_bot_send_message import SendMessage
+
+sentence_starter = [
+            'would', 'should', 'is', 'am', 'will', 'can', 'has', 'does', '8ball', 'are', 'were', 'weren\'t', 'werent' 'was', 'isnt', 'isn\'t ', 'could', 'do', 'did', 'rock-bot', 'rockbot', 'have'
+]
 
 async def PolarQuestionResponse(self, message):
     eight_ball_responses = [
@@ -28,17 +33,21 @@ async def PolarQuestionResponse(self, message):
             message.content + '... you know that is a good question, however I think you should ask someone else'
         ]
     if randrange(0,20) == 0:
-        await message.channel.send(eight_ball_rare_responses[randrange(0, len(eight_ball_rare_responses))])
+        # await message.channel.send(eight_ball_rare_responses[randrange(0, len(eight_ball_rare_responses))])
+        await SendMessage(eight_ball_rare_responses[randrange(0, len(eight_ball_rare_responses))], message.channel)
     else:
-        await message.channel.send(eight_ball_responses[randrange(0, len(eight_ball_responses))])
+        # await message.channel.send(eight_ball_responses[randrange(0, len(eight_ball_responses))])
+        await SendMessage(eight_ball_responses[randrange(0, len(eight_ball_responses))], message.channel)
 
 async def BinaryQuestionResponse(self, message):
     responses = ['The former', 'The latter']
     rare_responses = ['Neither', 'Both']
     if randrange(0,4) == 0:
-        await message.channel.send(rare_responses[randrange(0, len(rare_responses))])
+        # await message.channel.send(rare_responses[randrange(0, len(rare_responses))])
+        await SendMessage(rare_responses[randrange(0, len(rare_responses))], message.channel)
     else:
-        await message.channel.send(responses[randrange(0, len(responses))])
+        # await message.channel.send(responses[randrange(0, len(responses))])
+        await SendMessage(responses[randrange(0, len(responses))], message.channel)
 
 class EightBall(commands.Cog):
     def __init__(self, bot):
@@ -49,16 +58,34 @@ class EightBall(commands.Cog):
         if message.author.id == self.bot.user.id:
             return
 
-        sentence_starter = [
-            'would', 'should', 'is', 'am', 'will', 'can', 'has', 'does', '8ball', 'are', 'were', 'weren\'t', 'werent' 'was', 'isnt', 'isn\'t ', 'could', 'do', 'did', 'rock-bot', 'rockbot', 'have'
-        ]
+        global sentence_starter
+        edge_cases = ['at', 'away', 'not', 'now', 'be', 'do', 'who', 'what', 'where', 'when', 'how']
 
-        edge_cases = ['at', 'away', 'not', 'now', 'be', 'what']
+        message_split = message.content.lower().replace(',', '').split(' ')
+        try:
+            if message_split[0] in sentence_starter or (len(message_split) > 1 and message_split[1] in sentence_starter and message.content.endswith('?')):
+                if message_split[1].endswith('ing') or message_split[0] in edge_cases or message_split[1] in edge_cases:
+                    return
+                elif ' or ' in message.content.lower():
+                    await BinaryQuestionResponse(self, message)
+                else:
+                    await PolarQuestionResponse(self, message)
+        except IndexError:
+            return
 
-        if message.content.lower().endswith('?') or message.content.lower().replace(',', '').split(' ')[0] in sentence_starter:
-            if message.content.lower().split(' ')[1].endswith('ing') or message.content.lower().split(' ')[1] in edge_cases:
-                return
-            elif ' or ' in message.content.lower():
-                await BinaryQuestionResponse(self, message)
-            else:
-                await PolarQuestionResponse(self, message)
+    @commands.command()
+    async def bad(self, ctx):
+        global sentence_starter
+        responded = False
+        async for elem in ctx.channel.history():
+            if(elem.author.id == 452489462212067350):
+                responded = True
+            elif responded == True:
+                for word in sentence_starter:
+                    if word in elem.content:
+                        fopen = open('complaints.txt', 'a')
+                        fopen.write(elem.content + '\n')
+                        fopen.close()
+                        await SendMessage('Sorry..', ctx.channel)
+                        return
+        # await ctx.send(ctx.channel.history(limit=5))
